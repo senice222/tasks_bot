@@ -18,7 +18,7 @@ function splitIntoChunks(arr, chunkSize) {
 
 module.exports = function (bot) {
     bot.action(['?list_of_done_tasks', /\?list_of_done_tasks_(.+)/], async (ctx) => {
-        let arr = await Task.find({status: "done"})
+        let arr = await Task.find({ status: "done" })
 
         if (arr.length < 1) {
             return ctx.editMessageText(
@@ -68,28 +68,15 @@ module.exports = function (bot) {
             return [...page, navigationButtons, additionalButtons];
         });
 
-        if (ctx.update.callback_query.message.text) {
-            ctx.editMessageText(
-                'Список активных задач:',
-                {
-                    reply_markup: {
-                        resize_keyboard: true,
-                        inline_keyboard: pages[(ctx.match[1]) ? ctx.match[1] : 0]
-                    }
+        ctx.editMessageText(
+            'Список активных задач:',
+            {
+                reply_markup: {
+                    resize_keyboard: true,
+                    inline_keyboard: pages[(ctx.match[1]) ? ctx.match[1] : 0]
                 }
-            )
-        } else {
-            ctx.deleteMessage(ctx.update.callback_query.message.message_id)
-            ctx.reply(
-                'Список активных задач:',
-                {
-                    reply_markup: {
-                        resize_keyboard: true,
-                        inline_keyboard: pages[(ctx.match[1]) ? ctx.match[1] : 0]
-                    }
-                }
-            )
-        }
+            }
+        )
     }
     )
 }

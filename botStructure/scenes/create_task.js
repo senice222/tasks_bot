@@ -31,31 +31,21 @@ const createTask = new Scenes.WizardScene(
     },
     async (ctx) => {
         ctx.wizard.state.dataPush['descr'] = ctx.message.text
-        ctx.reply(
-            "Завершить создание задачи?",
-            {
-                reply_markup: finishKeyboard
-            }
-        ).then((msg) => ctx.wizard.state.deleteMessages.push(msg.message_id))
-    }
 
+        ctx.wizard.state.deleteMessages.forEach(msg => {
+            ctx.deleteMessage(msg)
+        })
+        const task = new Task(ctx.wizard.state.dataPush)
+        await task.save()
+    
+        ctx.reply("✅ Успешно создано!");
+        await ctx.scene.leave()
+    }
 )
 
 createTask.on("message", async (ctx, next) => {
     ctx.wizard.state.deleteMessages.push(ctx.message.message_id)
     next()
-})
-
-createTask.action("?finishScene", async (ctx) => {
-    ctx.wizard.state.deleteMessages.forEach(msg => {
-        ctx.deleteMessage(msg)
-    })
-    const task = new Task(ctx.wizard.state.dataPush)
-    await task.save()
-
-    ctx.answerCbQuery("✅ Успешно создано!", { show_alert: true });
-
-    await ctx.scene.leave()
 })
 
 createTask.action("?cancelScene", async (ctx) => {

@@ -2,7 +2,7 @@ const { Markup } = require('telegraf')
 const Task = require('../../../../serverProcessors/models/TaskModel')
 
 module.exports = (bot) => {
-	
+
 	bot.action(/\?lookTaskInside_(.+)/, async ctx => {
 		const task = await Task.findById(ctx.match[1])
 
@@ -55,7 +55,7 @@ module.exports = (bot) => {
 
 	bot.action(/\?delete_task_(.+)/, async (ctx) => {
 		const id = ctx.match[1]
-		await Task.deleteOne({_id: id})
+		await Task.deleteOne({ _id: id })
 
 		return ctx.editMessageText(
 			"Вы удалили эту задачу из списка ✅",

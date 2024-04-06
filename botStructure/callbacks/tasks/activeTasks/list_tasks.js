@@ -18,18 +18,16 @@ function splitIntoChunks(arr, chunkSize) {
 
 module.exports = function (bot) {
     bot.action(['?list_of_tasks', /\?list_of_tasks_(.+)/], async (ctx) => {
-        let arr = await Task.find({status: "active"})
+        let arr = await Task.find({ status: "active" })
 
         if (arr.length < 1) {
             return ctx.editMessageText(
                 "Задач нет.",
-                {
-                    reply_markup: Markup.inlineKeyboard([
-                        [
-                            Markup.button.callback("🔙 Назад", "?start")
-                        ]
-                    ]).resize().reply_markup
-                }
+                Markup.inlineKeyboard([
+                    [
+                        Markup.button.callback("🔙 Назад", "?start")
+                    ]
+                ]).resize()
             )
         }
 
@@ -44,9 +42,11 @@ module.exports = function (bot) {
             return { text: `⭐️ ${buttonTitle}`, callback_data: `?lookTaskInside_${taskId}` }
         })
 
+
         buttons.filter(section => section !== null && section !== undefined);
 
         const rows = splitIntoChunks(buttons, 1)
+
         let pages = [];
 
         for (let i = 0; i < rows.length; i += 4) {
@@ -68,28 +68,15 @@ module.exports = function (bot) {
             return [...page, navigationButtons, additionalButtons];
         });
 
-        if (ctx.update.callback_query.message.text) {
-            ctx.editMessageText(
-                'Список активных задач:',
-                {
-                    reply_markup: {
-                        resize_keyboard: true,
-                        inline_keyboard: pages[(ctx.match[1]) ? ctx.match[1] : 0]
-                    }
+        ctx.editMessageText(
+            'Список активных задач:',
+            {
+                reply_markup: {
+                    resize_keyboard: true,
+                    inline_keyboard: pages[(ctx.match[1]) ? ctx.match[1] : 0]
                 }
-            )
-        } else {
-            ctx.deleteMessage(ctx.update.callback_query.message.message_id)
-            ctx.reply(
-                'Список активных задач:',
-                {
-                    reply_markup: {
-                        resize_keyboard: true,
-                        inline_keyboard: pages[(ctx.match[1]) ? ctx.match[1] : 0]
-                    }
-                }
-            )
-        }
+            }
+        )
     }
     )
 }
